@@ -1,0 +1,65 @@
+name: Macintosh
+
+on:
+  push:
+    tags:
+      - V*
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_TYPE: Release
+  TARGET_NAME: KmlGenerator
+
+jobs:
+  build:
+    name: Build on OSX
+    runs-on: macos-12
+
+    steps:
+    - name: Prepare
+      run: |
+        sudo xcode-select --print-path
+        sudo xcode-select --switch /Library/Developer/CommandLineTools       
+
+    - name: Install
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.2.4
+        cached: 'false'
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_TYPE }}
+
+    - name: ConfigureLib
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_WITH_STATIC_LIB=ON
+
+    - name: BuildLib
+      run: cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_TYPE }}
+
+
+    - name: Release
+      if: startsWith(github.event.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/${{ env.TARGET_NAME }}
+        asset_name: ${{ env.TARGET_NAME }}_osx_${{ github.ref_name }}
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: ReleaseLib
+      if: startsWith(github.event.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/lib${{ env.TARGET_NAME }}.a
+        asset_name: lib${{ env.TARGET_NAME }}_osx_${{ github.ref_name }}.a
+        tag: ${{ github.ref }}
+        overwrite: true

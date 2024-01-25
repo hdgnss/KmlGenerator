@@ -1,0 +1,73 @@
+name: Windows
+
+on:
+  push:
+    tags:
+      - V*
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_TYPE: Release
+  TARGET_NAME: KmlGenerator
+
+jobs:
+  build:
+    name: Build on Win2019
+    runs-on: windows-2019
+
+    steps:
+    - name: Install
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.2.4
+        arch: win64_msvc2019_64
+        aqtversion: '==2.0.5'
+    
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure
+      shell: cmd
+      run: cmake -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      shell: cmd
+      run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
+
+    - name: ConfigureLib
+      shell: cmd
+      run: cmake -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_WITH_STATIC_LIB=ON
+
+    - name: BuildLib
+      shell: cmd
+      run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
+        
+    - name: Package
+      shell: pwsh
+      run: |
+        windeployqt --no-translations --compiler-runtime build\Release\${env:TARGET_NAME}'.exe'
+
+    - name: Installer
+      uses: joncloud/makensis-action@v3.7
+
+
+    - name: Release
+      if: startsWith(github.event.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ env.TARGET_NAME }}_setup.exe
+        asset_name: ${{ env.TARGET_NAME }}_win_${{ github.ref_name }}.exe
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: ReleaseLib
+      if: startsWith(github.event.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build\Release\${{ env.TARGET_NAME }}.lib
+        asset_name: ${{ env.TARGET_NAME }}_win_${{ github.ref_name }}.lib
+        tag: ${{ github.ref }}
+        overwrite: true

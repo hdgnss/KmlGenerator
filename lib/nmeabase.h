@@ -41,6 +41,7 @@ public:
     void getSatPoints(QString system, GnssPlotData *data);
     void getGllVersion(GnssGllVersion *version);
     void getStartUtc(QString table, qint64 *utc);
+    void getSatViewUsed(GnssPlotData *data);
 
 private:
     QSqlDatabase mDatabase;

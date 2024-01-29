@@ -260,31 +260,187 @@ QString KmlGenerator::onGenerateHtml(KmlPoint point, bool *isdf, long dutc){
             htmlStream.writeEndElement(); // END tr
         }
 
-        const QList<QString> snrs = {"L1SNR", "L2SNR", "L5SNR"};
-        const QList<QString> snrt = {"L1", "L2", "L5"};
-        const QList<QString> used = {"L1Used", "L2Used", "L5Used"};
-        for(int i=0; i<snrs.size(); i++){
+        const QList<QString> source = {"n", "b", "r", "l"};
+
+        const QList<QString> infol1 = {"L1",    "ME", "PE", "AD"};
+        for(int i=0; i<infol1.size(); i++){
             htmlStream.writeStartElement("tr");
             htmlStream.writeStartElement("td"); //td
             htmlStream.writeAttribute("style", "text-align:center;");
-            htmlStream.writeCharacters(snrt[i]);
+            htmlStream.writeCharacters(infol1[i]);
             htmlStream.writeEndElement(); // END td
             for(int j=0; j<point.satellites.size(); j++){
-                if(point.satellites[j][used[i]]=="1"){
+                QHash <QString, QString> sat;
+                sat["L1"] = point.satellites[j]["L1SNR"];
+                int info = point.satellites[j]["Info"].toInt();
+                if((info & (1 << 0)) != 0)
+                {
+                    sat["ME"] += "p";
+                }
+                else{
+                    sat["ME"] += "-";
+                }
+                if((info & (1 << 1)) != 0)
+                {
+                    sat["ME"] += "d";
+                }
+                else{
+                    sat["ME"] += "-";
+                }
+
+                if((info & (1 << 2)) != 0)
+                {
+                    sat["PE"] += "p";
+                }
+                else{
+                    sat["PE"] += "-";
+                }
+                if((info & (1 << 3)) != 0)
+                {
+                    sat["PE"] += "d";
+                }
+                else{
+                    sat["PE"] += "-";
+                }
+                sat["AD"] += source[(info & 0b110000) >> 4];
+                
+                sat["Used"] = point.satellites[j]["L1Used"];
+                if(sat["Used"]=="1"){
                     htmlStream.writeStartElement("td"); //td
                     htmlStream.writeAttribute("style", "color:DodgerBlue;text-align:center;");
-                    htmlStream.writeCharacters(point.satellites[j][snrs[i]]);
+                    htmlStream.writeCharacters(sat[infol1[i]]);
                     htmlStream.writeEndElement(); // END td
                 }
                 else{
                     htmlStream.writeStartElement("td"); //td
                     htmlStream.writeAttribute("style", "text-align:center;");
-                    htmlStream.writeCharacters(point.satellites[j][snrs[i]]);
+                    htmlStream.writeCharacters(sat[infol1[i]]);
                     htmlStream.writeEndElement(); // END td
                 }
             }
             htmlStream.writeEndElement(); // END tr
         }
+
+        if(l2==1){
+            const QList<QString> infol2 = {"L2",    "ME", "PE"};
+            for(int i=0; i<infol2.size(); i++){
+                htmlStream.writeStartElement("tr");
+                htmlStream.writeStartElement("td"); //td
+                htmlStream.writeAttribute("style", "text-align:center;");
+                htmlStream.writeCharacters(infol2[i]);
+                htmlStream.writeEndElement(); // END td
+                for(int j=0; j<point.satellites.size(); j++){
+                    QHash <QString, QString> sat;
+                    sat["L2"] = point.satellites[j]["L2SNR"];
+                    int info = point.satellites[j]["Info"].toInt();
+                    if((info & (1 << 11)) != 0)
+                    {
+                        sat["ME"] += "p";
+                    }
+                    else{
+                        sat["ME"] += "-";
+                    }
+                    if((info & (1 << 12)) != 0)
+                    {
+                        sat["ME"] += "d";
+                    }
+                    else{
+                        sat["ME"] += "-";
+                    }
+
+                    if((info & (1 << 13)) != 0)
+                    {
+                        sat["PE"] += "p";
+                    }
+                    else{
+                        sat["PE"] += "-";
+                    }
+                    if((info & (1 << 14)) != 0)
+                    {
+                        sat["PE"] += "d";
+                    }
+                    else{
+                        sat["PE"] += "-";
+                    }
+                    
+                    sat["Used"] = point.satellites[j]["L2Used"];
+                    if(sat["Used"]=="1"){
+                        htmlStream.writeStartElement("td"); //td
+                        htmlStream.writeAttribute("style", "color:DeepSkyBlue;text-align:center;");
+                        htmlStream.writeCharacters(sat[infol2[i]]);
+                        htmlStream.writeEndElement(); // END td
+                    }
+                    else{
+                        htmlStream.writeStartElement("td"); //td
+                        htmlStream.writeAttribute("style", "text-align:center;");
+                        htmlStream.writeCharacters(sat[infol2[i]]);
+                        htmlStream.writeEndElement(); // END td
+                    }
+                }
+                htmlStream.writeEndElement(); // END tr
+            }
+        }
+
+        if(l5==1){
+            const QList<QString> infol5 = {"L5",    "ME", "PE"};
+            for(int i=0; i<infol5.size(); i++){
+                htmlStream.writeStartElement("tr");
+                htmlStream.writeStartElement("td"); //td
+                htmlStream.writeAttribute("style", "text-align:center;");
+                htmlStream.writeCharacters(infol5[i]);
+                htmlStream.writeEndElement(); // END td
+                for(int j=0; j<point.satellites.size(); j++){
+                    QHash <QString, QString> sat;
+                    sat["L5"] = point.satellites[j]["L5SNR"];
+                    int info = point.satellites[j]["Info"].toInt();
+                    if((info & (1 << 7)) != 0)
+                    {
+                        sat["ME"] += "p";
+                    }
+                    else{
+                        sat["ME"] += "-";
+                    }
+                    if((info & (1 << 8)) != 0)
+                    {
+                        sat["ME"] += "d";
+                    }
+                    else{
+                        sat["ME"] += "-";
+                    }
+
+                    if((info & (1 << 9)) != 0)
+                    {
+                        sat["PE"] += "p";
+                    }
+                    else{
+                        sat["PE"] += "-";
+                    }
+                    if((info & (1 << 10)) != 0)
+                    {
+                        sat["PE"] += "d";
+                    }
+                    else{
+                        sat["PE"] += "-";
+                    }
+                    
+                    sat["Used"] = point.satellites[j]["L5Used"];
+                    if(sat["Used"]=="1"){
+                        htmlStream.writeStartElement("td"); //td
+                        htmlStream.writeAttribute("style", "color:RoyalBlue;text-align:center;");
+                        htmlStream.writeCharacters(sat[infol5[i]]);
+                        htmlStream.writeEndElement(); // END td
+                    }
+                    else{
+                        htmlStream.writeStartElement("td"); //td
+                        htmlStream.writeAttribute("style", "text-align:center;");
+                        htmlStream.writeCharacters(sat[infol5[i]]);
+                        htmlStream.writeEndElement(); // END td
+                    }
+                }
+                htmlStream.writeEndElement(); // END tr
+            }
+        }
+
         htmlStream.writeEndElement(); // END table
     }
 

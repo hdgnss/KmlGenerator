@@ -18,6 +18,7 @@
 #define GNSSTYPE_H
 
 #include <QHash>
+#include <QMap>
 #include <QString>
 #include <QVector>
 
@@ -74,14 +75,24 @@ typedef struct
 {
     GnssPosition position;
     QVector<QHash<QString, QString>> satellites;
+    QMap<QString, QString> information;
 } KmlPoint;
+
+typedef struct
+{
+    qint64 dataX;
+    QString dataY;
+    QString value;
+} GnssPlotMarkPoint;
 
 typedef struct
 {
     QVector<qint64> dataX;
     QVector<QString> dataY;
     bool isY2Axis;
+    bool averageLine;
     QString name;
+    QVector<GnssPlotMarkPoint> markPoint;
 } GnssPlotSeries;
 
 typedef struct

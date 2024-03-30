@@ -35,15 +35,32 @@ public:
     QString getVersion(void);
 
     void getKmlPoints(QVector<KmlPoint> *points, bool stt);
-    void getUtcList(QVector<QString> *utcs);
-    void getSatellite(QString utc, QStringList parameters, QString system, QVector<QHash<QString, QString>> *satellites);
-    void getPlotPoints(QStringList parameters, QString table, QString condition, GnssPlotData *data);
-    void getSatPoints(QString system, GnssPlotData *data);
-    void getGllVersion(GnssGllVersion *version);
-    void getStartUtc(QString table, qint64 *utc);
-    void getSatViewUsed(GnssPlotData *data);
+    
+    void getPlotSnrData(QString system, GnssPlotData *data);
+    void getPlotGllVersion(GnssGllVersion *version);
+
+    void getPlotViewData(GnssPlotData *data);
+    void getPlotAgcData(GnssPlotData *data);
+    void getPlotSpeedData(GnssPlotData *data);
+    void getPlotPowerData(GnssPlotData *data);
+    void getPlotBiasData(GnssPlotData *data);
+    void getPlotTcxoData(GnssPlotData *data);
+    void getPlotAltitudeData(GnssPlotData *data);
+    void getPlotDopData(GnssPlotData *data);
+    void getPlotContextData(GnssPlotData *data);
+    void getPlotTtffData(GnssPlotData *data);
+    void getPlotSpeedyData(GnssPlotData *data);
+    void getPlotTimeData(GnssPlotData *data);
+    void getPlotTemperatureData(GnssPlotData *data);
+    void getPlotSerialData(GnssPlotData *data);
+    void getPlotDgpsData(GnssPlotData *data);
+
 
 private:
+    void getSatellite(QString utc, QStringList parameters, QString system, QVector<QHash<QString, QString>> *satellites);
+    void getStartUtc(QString table, qint64 *utc);
+    void getPositionInfo(QString utc, QMap<QString, QString> *information);
+
     QSqlDatabase mDatabase;
     QSqlQuery mSqlQuery;
     bool mDebugEnabled;

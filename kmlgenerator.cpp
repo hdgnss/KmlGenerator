@@ -141,24 +141,36 @@ void KmlGenerator::onPoints(QVector<KmlPoint> points, QString icon){
         mKmlStream->writeTextElement("heading", point.position.bearing);
         mKmlStream->writeStartElement("Icon");
 
+        int quality = point.position.quality.toInt();
         double speed = point.position.speed.toDouble();
-        if(speed < 0.539){
-            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/static.png");
+        if (quality == 2){
+            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/dgps.png");
         }
-        else if(speed < (0.539*10)){
-            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/walking.png");
+        else if (quality == 4){
+            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/fixed.png");
         }
-        else if(speed < (0.539*35)){
-            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/biking.png");
+        else if (quality == 5){
+            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/float.png");
         }
-        else if(speed < (0.539*150)){
-            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/auto.png");
-        }
-        else if(speed < (0.539*900)){
-            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/plane.png");
-        }
-        else{
-            mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/rocket.png");
+        else {
+            if(speed < 0.539){
+                mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/static.png");
+            }
+            else if(speed < (0.539*10)){
+                mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/walking.png");
+            }
+            else if(speed < (0.539*35)){
+                mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/biking.png");
+            }
+            else if(speed < (0.539*150)){
+                mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/auto.png");
+            }
+            else if(speed < (0.539*900)){
+                mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/plane.png");
+            }
+            else{
+                mKmlStream->writeTextElement("href", "https://tools.hdgnss.com/kml/"+icon+"/rocket.png");
+            }
         }
         
         mKmlStream->writeEndElement(); //Icon
@@ -443,6 +455,21 @@ QString KmlGenerator::onGenerateHtml(KmlPoint point, bool *isdf, long dutc){
 
         htmlStream.writeEndElement(); // END table
     }
+
+    htmlStream.writeStartElement("table");
+    htmlStream.writeStartElement("tr");
+    htmlStream.writeTextElement("td", "LLA:");
+    htmlStream.writeTextElement("td", QString::number(point.position.latitude.toDouble(), 'f', 8));
+    htmlStream.writeTextElement("td", QString::number(point.position.longitude.toDouble(), 'f', 8));
+    htmlStream.writeTextElement("td", QString::number(point.position.altitude.toDouble(), 'f', 2));
+
+    for (auto it = point.information.begin(); it != point.information.end(); ++it) {
+        htmlStream.writeTextElement("td", it.key()+":");
+        htmlStream.writeTextElement("td", it.value());
+    }
+
+    htmlStream.writeEndElement(); // END tr
+    htmlStream.writeEndElement(); // END table
 
     htmlStream.writeStartElement("p"); //p
     htmlStream.writeAttribute("align", "right");

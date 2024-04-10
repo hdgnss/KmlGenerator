@@ -272,7 +272,7 @@ QString KmlGenerator::onGenerateHtml(KmlPoint point, bool *isdf, long dutc){
             htmlStream.writeEndElement(); // END tr
         }
 
-        const QList<QString> source = {"n", "b", "r", "l"};
+        const QList<QString> source = {"N", "B", "A", "L", "R", "C", "U", "U", "U"};
 
         const QList<QString> infol1 = {"L1",    "ME", "PE", "AD"};
         for(int i=0; i<infol1.size(); i++){
@@ -314,7 +314,7 @@ QString KmlGenerator::onGenerateHtml(KmlPoint point, bool *isdf, long dutc){
                 else{
                     sat["PE"] += "-";
                 }
-                sat["AD"] += source[(info & 0b110000) >> 4];
+                sat["AD"] += source[(info & 0b1110000) >> 4];
                 
                 sat["Used"] = point.satellites[j]["L1Used"];
                 if(sat["Used"]=="1"){

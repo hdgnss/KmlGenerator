@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     mCommandParser.addOption(mSttOption);
 
     QCommandLineOption mForceOption(QStringList() << "f" << "force",
-                                    QCoreApplication::translate("main", "Overwrite existing files"));
+                                    QCoreApplication::translate("main", "Overwrite existing files and ignore checksum"));
     mCommandParser.addOption(mForceOption);
 
     mCommandParser.process(app);
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         mCommandParser.showHelp(-1);
         return -1;
     }
-    
+
     mColor = mCommandParser.value(mColorOption);
     mIcon  = mCommandParser.value(mIconOption);
     mSttEnable = mCommandParser.isSet(mSttOption);
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     if (fileInfo.exists()) {
         qint64 fileSize = fileInfo.size();
         if(fileSize<135168 || mForce){
-            nmeabase->initBase(mInput);
+            nmeabase->initBase(mInput, mForce);
         }
     } 
 

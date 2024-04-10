@@ -30,7 +30,7 @@ public:
     NmeaBase(bool debug = false);
     ~NmeaBase();
     bool setBase(QString base);
-    void initBase(QString nmeafile);
+    void initBase(QString nmeafile, bool ignore);
     void closeBase();
     QString getVersion(void);
 

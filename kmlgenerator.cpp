@@ -462,7 +462,11 @@ QString KmlGenerator::onGenerateHtml(KmlPoint point, bool *isdf, long dutc){
     htmlStream.writeTextElement("td", QString::number(point.position.latitude.toDouble(), 'f', 8));
     htmlStream.writeTextElement("td", QString::number(point.position.longitude.toDouble(), 'f', 8));
     htmlStream.writeTextElement("td", QString::number(point.position.altitude.toDouble(), 'f', 2));
+    htmlStream.writeEndElement(); // END tr
+    htmlStream.writeEndElement(); // END table
 
+    htmlStream.writeStartElement("table");
+    htmlStream.writeStartElement("tr");
     for (auto it = point.information.begin(); it != point.information.end(); ++it) {
         htmlStream.writeTextElement("td", it.key()+":");
         htmlStream.writeTextElement("td", it.value());
